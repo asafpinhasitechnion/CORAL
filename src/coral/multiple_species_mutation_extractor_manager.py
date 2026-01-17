@@ -6,6 +6,7 @@ from collections import defaultdict
 import pandas as pd
 from .multiple_species_utils import annotate_tree_with_indices, save_annotated_tree, collapse_mutations, filter_mutations_dict
 from .plot_utils import MutationSpectraPlotter
+from .utils import log
 
 
 class MultipleSpeciesMutationExtractor:
@@ -100,7 +101,7 @@ class MultipleSpeciesMutationExtractor:
         header = ["chromosome", "position", "left", "right"] + [f"taxa{i}" for i in range(self.n_species)]
 
         if os.path.exists(csv_path) and not self.no_cache:
-            print(f'Using cached matching positions from csv at {csv_path}')
+            log(f'Using cached matching positions from csv at {csv_path}', self.verbose)
         else:
             with gzip.open(csv_path, 'wt', newline='') as outfile:
                 writer = csv.writer(outfile)
@@ -128,7 +129,7 @@ class MultipleSpeciesMutationExtractor:
                     ambiguous_counter += ambiguous
 
             self._save_results(mutation_dict)
-            print(f"Total ambiguous mutations: {ambiguous_counter}")
+            log(f"Total ambiguous mutations: {ambiguous_counter}", self.verbose)
 
     def _save_results(self, mutation_dict):
         spectra_plotter = MutationSpectraPlotter()

@@ -16,7 +16,10 @@ def main():
     single.add_argument("--species", nargs=4, metavar=("NAME1", "ACC1", "NAME2", "ACC2"), required=True)
     single.add_argument("--output", required=True)
     single.add_argument("--no-cache", action="store_true")
-    single.add_argument("--verbose", action="store_true")
+    verbose_group = single.add_mutually_exclusive_group()
+    verbose_group.add_argument("--verbose", dest="verbose", action="store_true", help="Enable verbose logging (default: enabled)")
+    verbose_group.add_argument("--quiet", dest="verbose", action="store_false", help="Disable verbose logging")
+    single.set_defaults(verbose=True)
     single.add_argument("--suffix", default=None)
     single.add_argument("--aligner-name", default="bwa")
     single.add_argument("--aligner-cmd", default=None)
@@ -34,7 +37,10 @@ def main():
     multi.add_argument("--species-list", type=json.loads, default=None, help='List of species as JSON, e.g. \'[["Homo_sapiens", "GCF_..."], ...]\'')
     multi.add_argument("--output", required=True)
     multi.add_argument("--no-cache", action="store_true")
-    multi.add_argument("--verbose", action="store_true")
+    verbose_group_multi = multi.add_mutually_exclusive_group()
+    verbose_group_multi.add_argument("--verbose", dest="verbose", action="store_true", help="Enable verbose logging (default: enabled)")
+    verbose_group_multi.add_argument("--quiet", dest="verbose", action="store_false", help="Disable verbose logging")
+    multi.set_defaults(verbose=True)
     multi.add_argument("--outgroup", default=None)
     multi.add_argument("--aligner-name", default="bwa")
     multi.add_argument("--aligner-cmd", default=None)
@@ -50,6 +56,10 @@ def main():
     # === Plotting ===
     plot = subparsers.add_parser("plot", help="Generate plots from output Tables directory")
     plot.add_argument("--tables", required=True)
+    verbose_group_plot = plot.add_mutually_exclusive_group()
+    verbose_group_plot.add_argument("--verbose", dest="verbose", action="store_true", help="Enable verbose logging (default: enabled)")
+    verbose_group_plot.add_argument("--quiet", dest="verbose", action="store_false", help="Disable verbose logging")
+    plot.set_defaults(verbose=True)
 
     # === Run PHYLIP ===
     phylip = subparsers.add_parser("run_phylip", help="Run PHYLIP on mutation matrix")
@@ -104,7 +114,7 @@ def main():
 
         elif args.subcmd == "plot":
             plotter = MutationSpectraPlotter()
-            plotter.plot(tables_dir=args.tables)
+            plotter.plot(tables_dir=args.tables, verbose=args.verbose)
 
         elif args.subcmd == "run_phylip":
             with open(args.mapping) as f:
@@ -117,7 +127,8 @@ def main():
                 prefix=args.prefix,
                 input_string=args.input_string,
                 mapping=mapping,
-                phylip_exe_dir=args.phylip_exe_dir
+                phylip_exe_dir=args.phylip_exe_dir,
+                verbose=args.verbose
             )
 
         else:

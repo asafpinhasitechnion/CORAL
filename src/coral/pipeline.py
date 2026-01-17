@@ -223,7 +223,7 @@ class MutationExtractionPipeline:
             output_file = os.path.join(output_dir, f"{base_name}_intervals.tsv.gz")
 
             if os.path.exists(output_file) and not no_cache:
-                print(f"Intervals already exist: {output_file}")
+                log(f"Intervals already exist: {output_file}", verbose)
                 return output_file
 
             bamfile = pysam.AlignmentFile(input_bam, "rb")
@@ -269,7 +269,7 @@ class MutationExtractionPipeline:
             df = pd.DataFrame(intervals, columns=["chromosome", "start", "end"])
             df.to_csv(output_file, sep='\t', index=False, compression="gzip")
 
-            print(f"Intervals written to: {output_file}")
+            log(f"Intervals written to: {output_file}", verbose)
             return output_file
     
     def extract_intervals(self):
@@ -286,7 +286,7 @@ class MutationExtractionPipeline:
         top_chroms = get_top_n_chromosomes(fai_file, n=3)
         log("Plotting coverage and mutation density for top chromosomes...", self.verbose)
         for chrom in top_chroms:
-            print(f"Plotting for {chrom}...")
+            log(f"Plotting for {chrom}...", self.verbose)
 
             coverage_plotter.plot(interval_dir=os.path.join(self.output_dir, 'Intervals'),
                                  chromosome=chrom,
@@ -370,7 +370,7 @@ class MultiSpeciesMutationPipeline:
         self.species_dict, default_outgroup = parse_species_accession_from_newick(self.newick_tree)
         if not self.outgroup_name:
             self.outgroup_name = default_outgroup
-        self.tree, self.terminal_mapping = annotate_tree_with_indices(self.newick_tree, self.outgroup_name)
+        self.tree, self.terminal_mapping = annotate_tree_with_indices(self.newick_tree, self.outgroup_name, verbose=self.verbose)
 
         tree_path = os.path.join(self.output_dir, "annotated_tree.nwk")
         save_annotated_tree(self.tree, tree_path)
@@ -382,7 +382,7 @@ class MultiSpeciesMutationPipeline:
         if not self.outgroup_name:
             raise ValueError("Outgroup name must be provided when species_list is used.")
         
-        _, self.terminal_mapping = annotate_list_with_indices(self.species_list, self.outgroup_name)
+        _, self.terminal_mapping = annotate_list_with_indices(self.species_list, self.outgroup_name, verbose=self.verbose)
 
         with open(os.path.join(self.output_dir, "species_mapping.json"), 'w') as f:
             json.dump(self.terminal_mapping, f, indent=2)

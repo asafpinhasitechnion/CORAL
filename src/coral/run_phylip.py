@@ -5,6 +5,7 @@ import subprocess
 import pandas as pd
 from ete3 import Tree
 from .multiple_species_utils import annotate_tree_with_indices, load_random_rows
+from .utils import log
 
 
 def write_phylip_infile(df, outfile):
@@ -58,7 +59,7 @@ def run_phylip_command(df, output_dir, exe_path, tree=None, prefix="run1", phyli
             os.remove(fname)
 
     write_phylip_infile(df, "infile")
-    print(f"PHYLIP input written to {os.path.abspath('infile')}")
+    log(f"PHYLIP input written to {os.path.abspath('infile')}", verbose)
 
     if tree:
         write_intree(tree, "intree")
@@ -95,8 +96,8 @@ def run_phylip_command(df, output_dir, exe_path, tree=None, prefix="run1", phyli
 
 
 
-def run_phylip(command, df_path, tree_path, output_dir, prefix, input_string, mapping, phylip_exe_dir=None):
-    df = load_random_rows(df_path).astype(str)
+def run_phylip(command, df_path, tree_path, output_dir, prefix, input_string, mapping, phylip_exe_dir=None, verbose=True):
+    df = load_random_rows(df_path, verbose=verbose).astype(str)
     # df = pd.read_csv(df_path, index_col=0).astype(str)
     tree = Tree(tree_path, format=1) if tree_path else None
 
@@ -122,7 +123,7 @@ def run_phylip(command, df_path, tree_path, output_dir, prefix, input_string, ma
     no_tree_dir = os.path.join(output_dir, f"{prefix}_no_tree")
     tree_dir = os.path.join(output_dir, f"{prefix}_with_tree")
 
-    print(f"Running PHYLIP {command} without a starting tree...")
+    log(f"Running PHYLIP {command} without a starting tree...", verbose)
     default_output = run_phylip_command(
         df,
         output_dir=no_tree_dir,
@@ -131,10 +132,10 @@ def run_phylip(command, df_path, tree_path, output_dir, prefix, input_string, ma
         prefix=prefix,
         phylip_input_args=input_string
     )
-    print("PHYLIP outputs (no tree):", default_output)
+    log(f"PHYLIP outputs (no tree): {default_output}", verbose)
 
     if tree_path:
-        print(f"Running PHYLIP {command} with a starting tree...")
+        log(f"Running PHYLIP {command} with a starting tree...", verbose)
         tree_output = run_phylip_command(
             df,
             output_dir=tree_dir,
@@ -143,24 +144,24 @@ def run_phylip(command, df_path, tree_path, output_dir, prefix, input_string, ma
             prefix="given_tree_run",
             phylip_input_args='U\n' + input_string
         )
-        print("PHYLIP outputs (with tree):", tree_output)
+        log(f"PHYLIP outputs (with tree): {tree_output}", verbose)
 
         
         # === Compare scores ===
         default_score = extract_parsimony_score(default_output["outfile"])
         given_score = extract_parsimony_score(tree_output["outfile"])
 
-        print("\nParsimony Score Comparison:")
-        print(f" - Most Parsimonious Tree Score: {default_score}")
-        print(f" - Given Tree Score: {given_score}")
+        log("\nParsimony Score Comparison:", verbose)
+        log(f" - Most Parsimonious Tree Score: {default_score}", verbose)
+        log(f" - Given Tree Score: {given_score}", verbose)
 
         if given_score == default_score:
-            print("The input tree is the most parsimonious.")
+            log("The input tree is the most parsimonious.", verbose)
         elif given_score > default_score:
             ratio = given_score/default_score
-            print(f"The input tree requires {ratio:.2f} times more changes than the most parsimonious tree.")
+            log(f"The input tree requires {ratio:.2f} times more changes than the most parsimonious tree.", verbose)
         else:
-            print(f"Unexpected: input tree is more parsimonious than the optimal tree (check logic).")
+            log(f"Unexpected: input tree is more parsimonious than the optimal tree (check logic).", verbose)
 
 
 if __name__ == "__main__":

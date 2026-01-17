@@ -8,6 +8,7 @@ from ete3 import Tree
 import sys
 import os
 import json
+from .utils import log
 
 def parse_species_accession_from_newick(newick_str):
     tree = Tree(newick_str, format=1)
@@ -35,7 +36,7 @@ def parse_species_accession_from_newick(newick_str):
     return species_accession_dict, outgroup
 
 
-def annotate_tree_with_indices(newick_str, outgroup_name, file_path=None):
+def annotate_tree_with_indices(newick_str, outgroup_name, file_path=None, verbose=True):
     tree = Tree(newick_str, format=1)
 
     # Normalize leaf names
@@ -78,13 +79,13 @@ def annotate_tree_with_indices(newick_str, outgroup_name, file_path=None):
         with open(mapping_path, "w") as f:
             json.dump(terminal_mapping, f, indent=2)
 
-        print(f"Annotated tree saved to {annotated_tree_path}")
-        print(f"Terminal mapping saved to {mapping_path}")
+        log(f"Annotated tree saved to {annotated_tree_path}", verbose)
+        log(f"Terminal mapping saved to {mapping_path}", verbose)
 
     return tree, terminal_mapping
 
 
-def annotate_list_with_indices(species_list, outgroup_name, file_path=None):
+def annotate_list_with_indices(species_list, outgroup_name, file_path=None, verbose=True):
 
     species_list = [species[0] for species in species_list]
     
@@ -100,7 +101,7 @@ def annotate_list_with_indices(species_list, outgroup_name, file_path=None):
         with open(mapping_path, "w") as f:
             json.dump(terminal_mapping, f, indent=2)
         
-        print(f"Terminal mapping saved to {mapping_path}")
+        log(f"Terminal mapping saved to {mapping_path}", verbose)
 
     return sorted_terminals, terminal_mapping
 
@@ -133,7 +134,7 @@ def collapse_mutations(mutation_dict):
     return collapsed
 
 
-def load_random_rows(file_path, max_rows=1000000, seed=42):
+def load_random_rows(file_path, max_rows=1000000, seed=42, verbose=True):
     random.seed(seed)
     
     # Count total rows (excluding header)
@@ -141,10 +142,10 @@ def load_random_rows(file_path, max_rows=1000000, seed=42):
         header = f.readline()
         total_rows = sum(1 for _ in f)
     
-    print(f"File has {total_rows} rows (excluding header).")
+    log(f"File has {total_rows} rows (excluding header).", verbose)
 
     if total_rows <= max_rows:
-        print("Loading full gzipped file.")
+        log("Loading full gzipped file.", verbose)
         return pd.read_csv(file_path, index_col=0, compression='gzip').astype(str)
     
     sampled_indices = set(random.sample(range(total_rows), max_rows))
