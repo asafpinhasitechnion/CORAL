@@ -1,0 +1,17 @@
+name: mutextractor_dev
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - bwa=0.7.17
+  - samtools=1.17
+  - pandas
+  - click
+  - biopython
+  - pysam #?
+  - matplotlib #?
+  - pip
+  - ete3
+  -psutil

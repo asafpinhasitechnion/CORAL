@@ -1,0 +1,26 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Logs and metadata
+*.log
+
+# Compressed files and alignment outputs
+*.gz
+*.zip
+*.bam
+*.bai
+*.fastq
+*.fasta
+
+# Temporary folders
+temp_*/
+
+# Environment files
+.env
+
+# macOS hidden file
+.DS_Store
+
+# Local genome output (optional, if too large to track)
+Output/
