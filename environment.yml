@@ -1,4 +1,4 @@
-name: mutextractor_dev
+name: coral-env
 channels:
   - bioconda
   - conda-forge
@@ -14,4 +14,4 @@ dependencies:
   - matplotlib #?
   - pip
   - ete3
-  -psutil
+  - psutil

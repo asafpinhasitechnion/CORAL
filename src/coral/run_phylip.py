@@ -48,7 +48,7 @@ def extract_parsimony_score(outfile_path):
                     return float(match.group(1))
     raise ValueError(f"Could not find parsimony score in {outfile_path}")
 
-def run_phylip_command(df, output_dir, exe_path, tree=None, prefix="run1", phylip_input_args="Y\n", remove_infile=True):
+def run_phylip_command(df, output_dir, exe_path, tree=None, prefix="run1", phylip_input_args="Y\n", remove_infile=True, verbose=True):
     exe_path = os.path.abspath(exe_path)
     os.makedirs(output_dir, exist_ok=True)
     cwd = os.getcwd()
@@ -111,7 +111,7 @@ def run_phylip(command, df_path, tree_path, output_dir, prefix, input_string, ma
     if phylip_exe_dir is None:
         # Default: resolve relative to package location
         package_dir = Path(__file__).resolve().parent.parent
-        phylip_exe_dir = package_dir / "scripts" / "phylip-3.697" / "exe"
+        phylip_exe_dir = package_dir / "src" / "phylip-3.697" / "exe"
     else:
         phylip_exe_dir = Path(phylip_exe_dir)
     
@@ -130,7 +130,8 @@ def run_phylip(command, df_path, tree_path, output_dir, prefix, input_string, ma
         exe_path=exe_path,
         tree=None,
         prefix=prefix,
-        phylip_input_args=input_string
+        phylip_input_args=input_string,
+        verbose=verbose
     )
     log(f"PHYLIP outputs (no tree): {default_output}", verbose)
 
@@ -142,7 +143,8 @@ def run_phylip(command, df_path, tree_path, output_dir, prefix, input_string, ma
             exe_path=exe_path,
             tree=tree,
             prefix="given_tree_run",
-            phylip_input_args='U\n' + input_string
+            phylip_input_args='U\n' + input_string,
+            verbose=verbose
         )
         log(f"PHYLIP outputs (with tree): {tree_output}", verbose)
 

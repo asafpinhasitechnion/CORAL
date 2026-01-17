@@ -52,6 +52,7 @@ def main():
     multi.add_argument("--mapq", type=int, default=60)
     multi.add_argument("--low-mapq", type=int, default=1)
     multi.add_argument("--cores", type=int, default=None)
+    multi.add_argument("--phylip-exe-dir", dest="phylip_exe_dir", default=None, help="Directory containing PHYLIP executables (default: resolves relative to package)")
 
     # === Plotting ===
     plot = subparsers.add_parser("plot", help="Generate plots from output Tables directory")
@@ -70,6 +71,10 @@ def main():
     phylip.add_argument("--phylip-exe-dir", dest="phylip_exe_dir", default=None, help="Directory containing PHYLIP executables (default: resolves relative to package)")
     phylip.add_argument("--prefix", default="phylip_run")
     phylip.add_argument("--input-string", default="Y\n")
+    verbose_group_phylip = phylip.add_mutually_exclusive_group()
+    verbose_group_phylip.add_argument("--verbose", dest="verbose", action="store_true", help="Enable verbose logging (default: enabled)")
+    verbose_group_phylip.add_argument("--quiet", dest="verbose", action="store_false", help="Disable verbose logging")
+    phylip.set_defaults(verbose=True)
 
     args = parser.parse_args()
 
@@ -109,6 +114,7 @@ def main():
                 low_mapq=args.low_mapq,
                 cores=args.cores,
                 continuity=args.continuity,
+                phylip_exe_dir=args.phylip_exe_dir,
             )
             pipeline.run()
 

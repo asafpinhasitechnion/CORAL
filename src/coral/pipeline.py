@@ -223,7 +223,7 @@ class MutationExtractionPipeline:
             output_file = os.path.join(output_dir, f"{base_name}_intervals.tsv.gz")
 
             if os.path.exists(output_file) and not no_cache:
-                log(f"Intervals already exist: {output_file}", verbose)
+                log(f"Intervals already exist: {output_file}", self.verbose)
                 return output_file
 
             bamfile = pysam.AlignmentFile(input_bam, "rb")
@@ -269,7 +269,7 @@ class MutationExtractionPipeline:
             df = pd.DataFrame(intervals, columns=["chromosome", "start", "end"])
             df.to_csv(output_file, sep='\t', index=False, compression="gzip")
 
-            log(f"Intervals written to: {output_file}", verbose)
+            log(f"Intervals written to: {output_file}", self.verbose)
             return output_file
     
     def extract_intervals(self):
@@ -327,6 +327,7 @@ class MultiSpeciesMutationPipeline:
         aligner_cmd=None,
         no_cache=False,
         verbose=True,
+        phylip_exe_dir=None,
         **kwargs,
     ):
         if newick_tree is None and species_list is None:
@@ -340,6 +341,7 @@ class MultiSpeciesMutationPipeline:
         self.aligner_cmd=aligner_cmd
         self.no_cache = no_cache
         self.verbose = verbose
+        self.phylip_exe_dir = phylip_exe_dir
         self.params = kwargs
 
         self.outgroup_name = outgroup
@@ -475,7 +477,9 @@ class MultiSpeciesMutationPipeline:
             output_dir=self.output_dir,
             prefix="multi_species_phylip",
             input_string="5\nY\n",
-            mapping=self.terminal_mapping
+            mapping=self.terminal_mapping,
+            phylip_exe_dir=self.phylip_exe_dir,
+            verbose=self.verbose
         )
 
 
