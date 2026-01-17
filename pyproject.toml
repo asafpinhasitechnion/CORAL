@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "coral"
+version = "0.1.0"
+description = "Multi-Species Mutation Extraction Pipeline"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pandas",
+    "click",
+    "biopython",
+    "pysam",
+    "matplotlib",
+    "ete3",
+    "psutil",
+]
+
+[project.scripts]
+coral = "coral.cli:main"
+
+[tool.setuptools]
+packages = ["coral"]
+
+[tool.setuptools.package-dir]
+"" = "src"
+

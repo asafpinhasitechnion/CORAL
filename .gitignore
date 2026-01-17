@@ -5,6 +5,7 @@ __pycache__/
 # Logs and metadata
 *.log
 
+
 # Compressed files and alignment outputs
 *.gz
 *.zip
@@ -16,6 +17,9 @@ __pycache__/
 # Temporary folders
 temp_*/
 
+# Temporary files
+*.tmp
+
 # Environment files
 .env
 
@@ -24,3 +28,6 @@ temp_*/
 
 # Local genome output (optional, if too large to track)
 Output/
+test_output/
+# Generated test outputs
+/test_output/

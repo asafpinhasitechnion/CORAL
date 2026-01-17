@@ -1,0 +1,7 @@
+pandas
+click
+biopython
+pysam
+matplotlib
+ete3
+psutil

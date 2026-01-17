@@ -1,3 +1,17 @@
+Metadata-Version: 2.4
+Name: coral
+Version: 0.1.0
+Summary: Multi-Species Mutation Extraction Pipeline
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: pandas
+Requires-Dist: click
+Requires-Dist: biopython
+Requires-Dist: pysam
+Requires-Dist: matplotlib
+Requires-Dist: ete3
+Requires-Dist: psutil
+
 
 # Multi-Species Mutation Extraction Pipeline
 
