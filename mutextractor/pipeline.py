@@ -35,9 +35,11 @@ class MutationExtractionPipeline:
         self.run_id = run_id
         if run_id is None:
             self.run_id = '__'.join([species[0] for species in [outgroup] + species_list])
-        suffix = ''
-        if 'suffix' in kwargs:
-            suffix = '_' + kwargs['suffix']
+        s = kwargs.get("suffix")
+        if s:
+            suffix = "_" + str(s)
+        else:
+            suffix = ""
         self.output_dir = f"{base_output_dir}/{self.run_id}{suffix}"
         self.params = kwargs
 
@@ -300,7 +302,7 @@ class MutationExtractionPipeline:
                                  mutation_category = r"[ACTG][C>T]G")
             
     def cleanup(self):
-        cleaner = PipelineCleaner(self.genomes + [self.reference], self.alignments, self.pileup, verbose=True)
+        cleaner = PipelineCleaner(self.genomes + [self.reference], self.alignments, self.pileup, base_dir=self.output_dir, verbose=True)
         cleaner.run(bams=True, pileup=True, genomes=True)
 
 

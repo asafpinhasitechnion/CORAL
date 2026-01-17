@@ -6,7 +6,7 @@ import sys
 import multiprocessing
 
 import pysam
-from utils import run_cmd, log  
+from .utils import run_cmd, log  
 from typing import Optional, TextIO
 import matplotlib.pyplot as plt
 

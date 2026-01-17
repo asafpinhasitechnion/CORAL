@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import shutil
 import subprocess
 import pandas as pd
@@ -94,7 +95,7 @@ def run_phylip_command(df, output_dir, exe_path, tree=None, prefix="run1", phyli
 
 
 
-def run_phylip(command, df_path, tree_path, output_dir, prefix, input_string, mapping):
+def run_phylip(command, df_path, tree_path, output_dir, prefix, input_string, mapping, phylip_exe_dir=None):
     df = load_random_rows(df_path).astype(str)
     # df = pd.read_csv(df_path, index_col=0).astype(str)
     tree = Tree(tree_path, format=1) if tree_path else None
@@ -106,8 +107,17 @@ def run_phylip(command, df_path, tree_path, output_dir, prefix, input_string, ma
             else:
                 raise ValueError(f"Species name '{node.name}' not found in mapping.")
 
-    # exe_path = os.path.abspath(f"./phylip-3.697/exe/{command}")
-    exe_path = os.path.abspath(f"../scripts/phylip-3.697/exe/{command}")
+    if phylip_exe_dir is None:
+        # Default: resolve relative to package location
+        package_dir = Path(__file__).resolve().parent.parent
+        phylip_exe_dir = package_dir / "scripts" / "phylip-3.697" / "exe"
+    else:
+        phylip_exe_dir = Path(phylip_exe_dir)
+    
+    exe_path = phylip_exe_dir / command
+    if not exe_path.exists():
+        raise FileNotFoundError(f"PHYLIP executable not found: {exe_path}")
+    exe_path = str(exe_path.resolve())
 
     no_tree_dir = os.path.join(output_dir, f"{prefix}_no_tree")
     tree_dir = os.path.join(output_dir, f"{prefix}_with_tree")

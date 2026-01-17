@@ -1,9 +1,10 @@
 import argparse
 import json
 import os
-from pipeline import MutationExtractionPipeline, MultiSpeciesMutationPipeline
-from run_phylip import run_phylip
-from plot_utils import MutationSpectraPlotter
+import sys
+from .pipeline import MutationExtractionPipeline, MultiSpeciesMutationPipeline
+from .run_phylip import run_phylip
+from .plot_utils import MutationSpectraPlotter
 
 def main():
     parser = argparse.ArgumentParser(description="Species Mutation Extraction CLI")
@@ -62,66 +63,70 @@ def main():
 
     args = parser.parse_args()
 
-    if args.subcmd == "run_single":
-        pipeline = MutationExtractionPipeline(
-            species_list=[(args.species[0], args.species[1]), (args.species[2], args.species[3])],
-            outgroup=(args.outgroup[0], args.outgroup[1]),
-            base_output_dir=args.output,
-            no_cache=args.no_cache,
-            verbose=args.verbose,
-            suffix=args.suffix,
-            aligner_name=args.aligner_name,
-            aligner_cmd=args.aligner_cmd,
-            streamed=args.streamed,
-            mapq=args.mapq,
-            low_mapq=args.low_mapq,
-            cores=args.cores,
-            continuity=args.continuity,
-            divergence_time=args.divergence_time,
-        )
-        pipeline.run()
+    try:
+        if args.subcmd == "run_single":
+            pipeline = MutationExtractionPipeline(
+                species_list=[(args.species[0], args.species[1]), (args.species[2], args.species[3])],
+                outgroup=(args.outgroup[0], args.outgroup[1]),
+                base_output_dir=args.output,
+                no_cache=args.no_cache,
+                verbose=args.verbose,
+                suffix=args.suffix,
+                aligner_name=args.aligner_name,
+                aligner_cmd=args.aligner_cmd,
+                streamed=args.streamed,
+                mapq=args.mapq,
+                low_mapq=args.low_mapq,
+                cores=args.cores,
+                continuity=args.continuity,
+                divergence_time=args.divergence_time,
+            )
+            pipeline.run()
 
-    elif args.subcmd == "run_multi":
-        pipeline = MultiSpeciesMutationPipeline(
-            newick_tree=args.newick_tree,
-            species_list=args.species_list,
-            base_output_dir=args.output,
-            outgroup=args.outgroup,
-            no_cache=args.no_cache,
-            verbose=args.verbose,
-            aligner_name=args.aligner_name,
-            aligner_cmd=args.aligner_cmd,
-            run_id=args.run_id,
-            streamed=args.streamed,
-            mapq=args.mapq,
-            low_mapq=args.low_mapq,
-            cores=args.cores,
-            continuity=args.continuity,
-        )
-        pipeline.run()
+        elif args.subcmd == "run_multi":
+            pipeline = MultiSpeciesMutationPipeline(
+                newick_tree=args.newick_tree,
+                species_list=args.species_list,
+                base_output_dir=args.output,
+                outgroup=args.outgroup,
+                no_cache=args.no_cache,
+                verbose=args.verbose,
+                aligner_name=args.aligner_name,
+                aligner_cmd=args.aligner_cmd,
+                run_id=args.run_id,
+                streamed=args.streamed,
+                mapq=args.mapq,
+                low_mapq=args.low_mapq,
+                cores=args.cores,
+                continuity=args.continuity,
+            )
+            pipeline.run()
 
+        elif args.subcmd == "plot":
+            plotter = MutationSpectraPlotter()
+            plotter.plot(tables_dir=args.tables)
 
-    elif args.subcmd == "plot":
-        plotter = MutationSpectraPlotter()
-        plotter.plot(tables_dir=args.tables)
+        elif args.subcmd == "run_phylip":
+            with open(args.mapping) as f:
+                mapping = json.load(f)
+            run_phylip(
+                command=args.phylip_command,
+                df_path=args.df,
+                tree_path=args.tree,
+                output_dir=os.path.dirname(args.df),
+                prefix=args.prefix,
+                input_string=args.input_string,
+                mapping=mapping,
+                phylip_exe_dir=args.phylip_exe_dir
+            )
 
-    elif args.subcmd == "run_phylip":
-        with open(args.mapping) as f:
-            mapping = json.load(f)
-        run_phylip(
-            command=args.phylip_command,
-            df_path=args.df,
-            tree_path=args.tree,
-            output_dir=os.path.dirname(args.df),
-            prefix=args.prefix,
-            input_string=args.input_string,
-            mapping=mapping,
-            phylip_exe_dir=args.phylip_exe_dir
-        )
-
-    else:
-        parser.print_help()
+        else:
+            parser.print_help()
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
     main()
+

@@ -3,10 +3,11 @@ import shutil
 from utils import log
 
 class PipelineCleaner:
-    def __init__(self, genomes, alignments, pileup, verbose=True):
+    def __init__(self, genomes, alignments, pileup, base_dir=None, verbose=True):
         self.genomes = genomes
         self.alignments = alignments
         self.pileup = pileup
+        self.base_dir = base_dir
         self.verbose = verbose
 
     def _log(self, message):
