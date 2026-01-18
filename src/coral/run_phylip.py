@@ -30,6 +30,45 @@ def write_intree(tree, outfile):
 
 import re
 
+def find_phylip_executable(command):
+    """
+    Find PHYLIP executable in PATH (e.g., from conda installation).
+    
+    Args:
+        command: PHYLIP command name (e.g., 'dnapars')
+    
+    Returns:
+        str: Command name if found in PATH
+    
+    Raises:
+        FileNotFoundError: If executable cannot be found in PATH
+    """
+    # Check if command is available in PATH (conda installation)
+    if shutil.which(command):
+        return command
+    
+    # Not found in PATH
+    raise FileNotFoundError(
+        f"PHYLIP executable '{command}' not found in PATH.\n"
+        f"Please install PHYLIP via conda: `conda install -c bioconda phylip`"
+    )
+
+def check_phylip_available(command='dnapars'):
+    """
+    Check if PHYLIP is available in the system.
+    
+    Args:
+        command: PHYLIP command to check (default: 'dnapars')
+    
+    Returns:
+        bool: True if PHYLIP is available, False otherwise
+    """
+    try:
+        find_phylip_executable(command)
+        return True
+    except FileNotFoundError:
+        return False
+
 def extract_parsimony_score(outfile_path):
     """
     Extracts the parsimony score (total number of changes) from a PHYLIP outfile.
@@ -49,7 +88,10 @@ def extract_parsimony_score(outfile_path):
     raise ValueError(f"Could not find parsimony score in {outfile_path}")
 
 def run_phylip_command(df, output_dir, exe_path, tree=None, prefix="run1", phylip_input_args="Y\n", remove_infile=True, verbose=True):
-    exe_path = os.path.abspath(exe_path)
+    # Only convert to absolute path if it's actually a path (contains path separators)
+    # If it's just a command name (e.g., "dnapars"), keep it as-is so PATH resolution works
+    if os.sep in exe_path or (os.altsep and os.altsep in exe_path):
+        exe_path = os.path.abspath(exe_path)
     os.makedirs(output_dir, exist_ok=True)
     cwd = os.getcwd()
     os.chdir(output_dir)
@@ -96,7 +138,7 @@ def run_phylip_command(df, output_dir, exe_path, tree=None, prefix="run1", phyli
 
 
 
-def run_phylip(command, df_path, tree_path, output_dir, prefix, input_string, mapping, phylip_exe_dir=None, verbose=True):
+def run_phylip(command, df_path, tree_path, output_dir, prefix, input_string, mapping, verbose=True):
     df = load_random_rows(df_path, verbose=verbose).astype(str)
     # df = pd.read_csv(df_path, index_col=0).astype(str)
     tree = Tree(tree_path, format=1) if tree_path else None
@@ -108,17 +150,8 @@ def run_phylip(command, df_path, tree_path, output_dir, prefix, input_string, ma
             else:
                 raise ValueError(f"Species name '{node.name}' not found in mapping.")
 
-    if phylip_exe_dir is None:
-        # Default: resolve relative to package location
-        package_dir = Path(__file__).resolve().parent.parent
-        phylip_exe_dir = package_dir / "src" / "phylip-3.697" / "exe"
-    else:
-        phylip_exe_dir = Path(phylip_exe_dir)
-    
-    exe_path = phylip_exe_dir / command
-    if not exe_path.exists():
-        raise FileNotFoundError(f"PHYLIP executable not found: {exe_path}")
-    exe_path = str(exe_path.resolve())
+    # Find PHYLIP executable in PATH
+    exe_path = find_phylip_executable(command)
 
     no_tree_dir = os.path.join(output_dir, f"{prefix}_no_tree")
     tree_dir = os.path.join(output_dir, f"{prefix}_with_tree")
