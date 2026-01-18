@@ -62,34 +62,31 @@ Standard short-read aligners (for example, BWA) are used for efficiency and robu
 
 ### Single-lineage analysis (outgroup + two ingroups)
 coral run_single \
-  --outgroup Drosophila_helvetica GCA_963969585.1 \
-  --species Drosophila_pseudoobscura GCF_009870125.1 \
-           Drosophila_miranda GCF_003369915.1 \
-  --output ./output \
+  --outgroup Saccharomyces_mikatae_IFO_1815 GCF_947241705.1 \
+  --species Saccharomyces_paradoxus GCF_002079055.1 Saccharomyces_cerevisiae_S288C GCF_000146045.2 \
+  --output ../test_output \
   --mapq 60 \
-  --suffix MAPQ60
+  --suffix test
 
 ---
 
 ### Multi-species analysis from a species list
 coral run_multi \
-  --species-list '[["Drosophila_melanogaster","GCF_000001215.4"],
-                   ["Drosophila_sechellia","GCF_000006755.1"],
-                   ["Drosophila_mauritiana","GCF_004382145.1"],
-                   ["Drosophila_santomea","GCF_016746245.2"],
-                   ["Drosophila_simulans","GCF_000754195.3"]]' \
+  --species-list '[["Drosophila_melanogaster","GCF_000001215.4"],["Drosophila_sechellia","GCF_000006755.1"],["Drosophila_mauritiana","GCF_004382145.1"],["Drosophila_santomea","GCF_016746245.2"],["Drosophila_simulans","GCF_016746395.2"]]' \
   --outgroup Drosophila_simulans \
-  --output ./output \
-  --run-id drosophila_multi \
+  --output ../test_output \
+  --run-id multi_test \
   --mapq 60
 
 ---
 
 ### Multi-species analysis from a Newick tree
 coral run_multi \
-  --newick-tree species_tree.nwk \
-  --outgroup Drosophila_santomea \
-  --output ./output
+  --newick-tree "(((Drosophila_melanogaster|GCF_000001215.4,Drosophila_sechellia|GCF_000006755.1),Drosophila_mauritiana|GCF_004382145.1),Drosophila_santomea|GCF_016746245.2,Drosophila_simulans|GCF_016746395.2);" \
+  --outgroup Drosophila_simulans \
+  --output ../test_output \
+  --run-id multi_test \
+  --mapq 60
 
 ---
 

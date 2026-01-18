@@ -68,15 +68,21 @@ class MultipleSpeciesMutationExtractor:
         if node.is_leaf():
             node.add_feature("state", {row[f"taxa{self.mapping[node.name]}"]})
             return node.state
-        left_state = self._recursive_state_check(node.children[0], row)
-        right_state = self._recursive_state_check(node.children[1], row)
-        intersect = left_state & right_state
-        node_state = intersect if intersect else left_state | right_state
+        # Handle nodes with any number of children (supporting multifurcating trees)
+        child_states = [self._recursive_state_check(child, row) for child in node.children]
+        # Intersect all child states if any intersection exists, otherwise union
+        node_state = child_states[0]
+        for child_state in child_states[1:]:
+            intersect = node_state & child_state
+            node_state = intersect if intersect else node_state | child_state
         node.add_feature("state", node_state)
         return node_state
 
     def _recursive_fitch(self, node, parent_state, row, mutation_dict, ambiguous_count):
         next_state = parent_state
+        # Ensure node.state exists (should be set by _recursive_state_check, but add safety check)
+        if not hasattr(node, 'state'):
+            raise RuntimeError(f"Node {node.name} missing state attribute. Tree may not have been properly initialized.")
         if parent_state not in node.state:
             if len(node.state) > 1:
                 return mutation_dict, ambiguous_count + 1
