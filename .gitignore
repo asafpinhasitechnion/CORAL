@@ -26,6 +26,8 @@ temp_*/
 # macOS hidden file
 .DS_Store
 
+*.egg-info/
+
 # Local genome output (optional, if too large to track)
 Output/
 test_output/
