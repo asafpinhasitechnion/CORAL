@@ -4,7 +4,6 @@ import os
 import sys
 from .pipeline import MutationExtractionPipeline, MultiSpeciesMutationPipeline
 from .run_phylip import run_phylip
-from .plot_utils import MutationSpectraPlotter
 
 def main():
     parser = argparse.ArgumentParser(description="Species Mutation Extraction CLI")
@@ -52,14 +51,6 @@ def main():
     multi.add_argument("--mapq", type=int, default=60)
     multi.add_argument("--low-mapq", type=int, default=1)
     multi.add_argument("--cores", type=int, default=None)
-
-    # === Plotting ===
-    plot = subparsers.add_parser("plot", help="Generate plots from output Tables directory")
-    plot.add_argument("--tables", required=True)
-    verbose_group_plot = plot.add_mutually_exclusive_group()
-    verbose_group_plot.add_argument("--verbose", dest="verbose", action="store_true", help="Enable verbose logging (default: enabled)")
-    verbose_group_plot.add_argument("--quiet", dest="verbose", action="store_false", help="Disable verbose logging")
-    plot.set_defaults(verbose=True)
 
     # === Run PHYLIP ===
     phylip = subparsers.add_parser("run_phylip", help="Run PHYLIP on mutation matrix")
@@ -114,10 +105,6 @@ def main():
                 continuity=args.continuity,
             )
             pipeline.run()
-
-        elif args.subcmd == "plot":
-            plotter = MutationSpectraPlotter()
-            plotter.plot(tables_dir=args.tables, verbose=args.verbose)
 
         elif args.subcmd == "run_phylip":
             with open(args.mapping) as f:
