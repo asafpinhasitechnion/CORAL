@@ -7,7 +7,7 @@ Reference
 Please cite: will be available upon publication
 
 ---
-<img width="8131" height="2352" alt="Figure1_Species_mutations_Asaf (8)" src="https://github.com/user-attachments/assets/80d9c5af-6981-4d76-8795-cb0a9b882027" />
+<img width="4066" height="1176" alt="CORAL_pipeline" src="https://github.com/user-attachments/assets/dd9d9d43-8775-4585-9be7-1f0bafebfc92" />
 
 ## Core Concepts
 
