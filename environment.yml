@@ -15,6 +15,7 @@ dependencies:
   - ete3
   - psutil
   - matplotlib
+  - unzip
   - pip
   - setuptools
   - wheel
