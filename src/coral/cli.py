@@ -52,7 +52,6 @@ def main():
     multi.add_argument("--mapq", type=int, default=60)
     multi.add_argument("--low-mapq", type=int, default=1)
     multi.add_argument("--cores", type=int, default=None)
-    multi.add_argument("--phylip-exe-dir", dest="phylip_exe_dir", default=None, help="Directory containing PHYLIP executables (default: resolves relative to package)")
 
     # === Plotting ===
     plot = subparsers.add_parser("plot", help="Generate plots from output Tables directory")
@@ -68,7 +67,6 @@ def main():
     phylip.add_argument("--tree", required=True, help="Path to annotated_tree.nwk")
     phylip.add_argument("--mapping", required=True, help="Path to species_mapping.json")
     phylip.add_argument("--phylip-command", dest="phylip_command", default="dnapars", help="PHYLIP command: dnapars, dnapenny, etc.")
-    phylip.add_argument("--phylip-exe-dir", dest="phylip_exe_dir", default=None, help="Directory containing PHYLIP executables (default: resolves relative to package)")
     phylip.add_argument("--prefix", default="phylip_run")
     phylip.add_argument("--input-string", default="Y\n")
     verbose_group_phylip = phylip.add_mutually_exclusive_group()
@@ -114,7 +112,6 @@ def main():
                 low_mapq=args.low_mapq,
                 cores=args.cores,
                 continuity=args.continuity,
-                phylip_exe_dir=args.phylip_exe_dir,
             )
             pipeline.run()
 
@@ -133,7 +130,6 @@ def main():
                 prefix=args.prefix,
                 input_string=args.input_string,
                 mapping=mapping,
-                phylip_exe_dir=args.phylip_exe_dir,
                 verbose=args.verbose
             )
 

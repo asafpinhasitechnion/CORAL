@@ -312,7 +312,7 @@ from .multiple_species_utils import (
     annotate_tree_with_indices,
     save_annotated_tree,
 )
-from .run_phylip import run_phylip
+from .run_phylip import run_phylip, check_phylip_available
 
 
 class MultiSpeciesMutationPipeline:
@@ -327,7 +327,6 @@ class MultiSpeciesMutationPipeline:
         aligner_cmd=None,
         no_cache=False,
         verbose=True,
-        phylip_exe_dir=None,
         **kwargs,
     ):
         if newick_tree is None and species_list is None:
@@ -341,7 +340,6 @@ class MultiSpeciesMutationPipeline:
         self.aligner_cmd=aligner_cmd
         self.no_cache = no_cache
         self.verbose = verbose
-        self.phylip_exe_dir = phylip_exe_dir
         self.params = kwargs
 
         self.outgroup_name = outgroup
@@ -365,6 +363,14 @@ class MultiSpeciesMutationPipeline:
         self.align_species_to_outgroup()
         self.generate_pileup()
         self._extract_mutations()
+        
+        # Validate PHYLIP is available before phylogenetic reconstruction
+        if not check_phylip_available('dnapars'):
+            raise RuntimeError(
+                "PHYLIP is required for multi-species phylogenetic reconstruction but was not found.\n"
+                "Please install PHYLIP via conda: `conda install -c bioconda phylip`"
+            )
+        
         self._reconstruct_phylogeny()
         log("Pipeline completed successfully.", self.verbose)
 
@@ -478,7 +484,6 @@ class MultiSpeciesMutationPipeline:
             prefix="multi_species_phylip",
             input_string="5\nY\n",
             mapping=self.terminal_mapping,
-            phylip_exe_dir=self.phylip_exe_dir,
             verbose=self.verbose
         )
 

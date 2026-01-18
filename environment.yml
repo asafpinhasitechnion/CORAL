@@ -19,3 +19,6 @@ dependencies:
   - pip
   - setuptools
   - wheel
+  # Optional: PHYLIP (required for multi-species pipeline and run_phylip command)
+  # Uncomment the following line if you need PHYLIP functionality:
+  # - phylip

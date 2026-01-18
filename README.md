@@ -149,8 +149,9 @@ Users must ensure required tools are available in their environment and in PATH.
 - BWA (default aligner)  
   https://github.com/bwa-mem2/bwa-mem2
 
-Optional:
-- PHYLIP  
+**Optional (Required for multi-species pipeline):**
+- PHYLIP - Required for `coral run_multi` command  
+  Install via conda: `conda install -c bioconda phylip`  
   http://evolution.genetics.washington.edu/phylip.html
 
 ---
@@ -179,6 +180,12 @@ conda install -c bioconda samtools bwa -y
 conda install -c bioconda minimap2 bbmap -y
 ```
 
+**Optional: PHYLIP (Required for multi-species pipeline)**
+```bash
+conda install -c bioconda phylip -y
+```
+PHYLIP is automatically detected when installed via conda. If using the multi-species pipeline (`coral run_multi`), PHYLIP must be installed or the pipeline will raise an error.
+
 **3. Install CORAL**
 
 From the CORAL repository root:
@@ -193,6 +200,8 @@ python -c "import coral; print('CORAL OK')"
 samtools --version
 bwa
 datasets --version
+# If using multi-species pipeline, verify PHYLIP:
+dnapars  # Should show PHYLIP help if installed
 ```
 
 ### Option 2: Python venv (Advanced users)
@@ -209,13 +218,35 @@ pip install -e .
 
 ---
 
-## PHYLIP Integration (Optional)
+## PHYLIP Integration
 
+PHYLIP is **required for the full multi-species pipeline** (`coral run_multi`) and optional for standalone phylogenetic analysis (`coral run_phylip`).
+
+### Installation
+
+**Recommended (via conda):**
+```bash
+conda install -c bioconda phylip
+```
+
+When installed via conda, PHYLIP executables are automatically detected in PATH. No additional configuration is needed.
+
+### Usage
+
+**Multi-species pipeline (automatically uses PHYLIP):**
+```bash
+coral run_multi --newick-tree "..." --outgroup SpeciesName --output ./output
+```
+
+**Standalone PHYLIP analysis:**
+```bash
 coral run_phylip \
   --df ./output/run_id/matching_bases.csv.gz \
   --tree ./output/run_id/annotated_tree.nwk \
-  --mapping ./output/run_id/species_mapping.json \
-  --phylip-exe-dir /path/to/phylip/exe
+  --mapping ./output/run_id/species_mapping.json
+```
+
+**Note:** PHYLIP must be installed via conda and available in PATH. The multi-species pipeline will raise an error if PHYLIP is not found. Install it via conda before running `coral run_multi`.
 
 ---
 
