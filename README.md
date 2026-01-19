@@ -30,7 +30,7 @@ This approach:
 - Is computationally lightweight
 - Scales naturally across many species
 
-Standard short-read aligners (for example, BWA) are used for efficiency and robustness.
+Standard short-read aligners (default: BWA, validated with classic BWA; BWA-MEM2 and other aligners are also supported) are used for efficiency and robustness.
 
 ---
 
@@ -60,7 +60,7 @@ Standard short-read aligners (for example, BWA) are used for efficiency and robu
 
 ## Example Usage
 
-### Single-lineage analysis (outgroup + two ingroups)
+### Three-taxon pipeline (pairwise sister-taxa analysis: outgroup + two ingroups)
 coral run_single \
   --outgroup Saccharomyces_mikatae_IFO_1815 GCF_947241705.1 \
   --species Saccharomyces_paradoxus GCF_002079055.1 Saccharomyces_cerevisiae_S288C GCF_000146045.2 \
@@ -103,11 +103,13 @@ Results from run_multi should therefore be interpreted with caution and are best
 ## Output Summary
 
 Each run produces a self-contained directory with:
-- *.pileup.gz – multi-taxa pileup
-- *_mutations.csv.gz – full mutation list
-- *_mutations.json – mutation context counts
-- Tables/*.tsv – normalized and collapsed spectra
-- Plots/*.png – mutation spectra, genomic distributions, MAPQ diagnostics
+- `<run_id>.pileup.gz` – multi-taxa pileup (in run root)
+- `Mutations/*_mutations.csv.gz` – full mutation lists (one per species pair)
+- `Mutations/*_mutations.json` – mutation context counts (one per species pair)
+- `Tables/*.tsv` – normalized and collapsed spectra
+- `Plots/*.png` – mutation spectra, genomic distributions, MAPQ diagnostics
+
+**Mutation file naming:** Files are named `<taxon1>__<taxon2>__<reference>__mutations.*` where the file contains mutations inferred to have occurred on the branch leading to `<taxon1>` since its divergence from `<taxon2>`, using `<reference>` as the outgroup/reference genome. See [OUTPUT_FORMAT.md](OUTPUT_FORMAT.md) for detailed naming conventions and file formats.
 
 ---
 
@@ -133,32 +135,47 @@ cleanup_output.sh output/ --bams --pileup --intervals --genomes
 
 ## Installation and Environment
 
-CORAL does not install or configure external bioinformatics tools.
-Users must ensure required tools are available in their environment and in PATH.
+### Option 1: Using environment.yml (Recommended - Easiest)
 
-### Required External Tools
-- NCBI Datasets CLI  
-  https://www.ncbi.nlm.nih.gov/datasets/docs/v2/download-and-install/
+The `environment.yml` file automatically installs all required dependencies, including external bioinformatics tools.
 
-- SAMtools  
-  https://www.htslib.org/doc/samtools.html
+**1. Create environment from environment.yml**
+```bash
+conda env create -f environment.yml
+conda activate coral-env
+```
 
-- BWA (default aligner)  
-  https://github.com/bwa-mem2/bwa-mem2
+**2. Install CORAL**
+```bash
+pip install -e .
+```
 
-**Optional (Required for multi-species pipeline):**
-- PHYLIP - Required for `coral run_multi` command  
-  Install via conda: `conda install -c bioconda phylip`  
-  http://evolution.genetics.washington.edu/phylip.html
+**3. Verify installation**
+```bash
+coral --help
+python -c "import coral; print('CORAL OK')"
+samtools --version
+bwa
+datasets --version
+```
+
+**Note:** The `environment.yml` includes:
+- Python 3.10
+- BWA (classic, version 0.7.17)
+- SAMtools (version 1.17)
+- NCBI Datasets CLI
+- All Python dependencies
+
+**For multi-species pipeline:** PHYLIP is commented out in `environment.yml`. Uncomment the `phylip` line in the file, or install separately:
+```bash
+conda install -c bioconda phylip -y
+```
 
 ---
 
-## Environment Setup (Recommended)
+### Option 2: Manual Conda Installation
 
-CORAL should be installed in a dedicated Python environment.
-The recommended approach is conda, since it cleanly handles both Python and bioinformatics binaries.
-
-### Option 1: Conda Environment (Recommended)
+If you prefer to set up the environment manually:
 
 **1. Create a new environment**
 ```bash
@@ -181,11 +198,9 @@ conda install -c bioconda minimap2 bbmap -y
 ```bash
 conda install -c bioconda phylip -y
 ```
-PHYLIP is automatically detected when installed via conda. If using the multi-species pipeline (`coral run_multi`), PHYLIP must be installed or the pipeline will raise an error.
+PHYLIP must be available in PATH for the multi-species pipeline (`coral run_multi`). When installed via conda, PHYLIP executables are automatically detected. The pipeline will raise an error if PHYLIP is not found in PATH.
 
 **3. Install CORAL**
-
-From the CORAL repository root:
 ```bash
 pip install -e .
 ```
@@ -201,7 +216,29 @@ datasets --version
 dnapars  # Should show PHYLIP help if installed
 ```
 
-### Option 2: Python venv (Advanced users)
+---
+
+### Required External Tools
+
+If installing manually (not using `environment.yml`), you need:
+
+- **NCBI Datasets CLI**  
+  https://www.ncbi.nlm.nih.gov/datasets/docs/v2/download-and-install/
+
+- **SAMtools**  
+  https://www.htslib.org/doc/samtools.html
+
+- **BWA (default aligner)** - Classic BWA is the default and was used for validation. Other versions including BWA-MEM2 are also supported.  
+  Classic BWA (default): https://github.com/lh3/bwa  
+  BWA-MEM2: https://github.com/bwa-mem2/bwa-mem2  
+  Note: `conda install bwa` installs classic BWA. To use BWA-MEM2, use `--aligner-name bwa-mem2` (BWA-MEM2 must be installed separately).
+
+**Optional (Required for multi-species pipeline):**
+- **PHYLIP** - Required for `coral run_multi` command  
+  Install via conda: `conda install -c bioconda phylip`  
+  http://evolution.genetics.washington.edu/phylip.html
+
+### Option 3: Python venv (Advanced users)
 
 Use this only if external tools are already installed system-wide.
 
@@ -243,7 +280,14 @@ coral run_phylip \
   --mapping ./output/run_id/species_mapping.json
 ```
 
-**Note:** PHYLIP must be installed via conda and available in PATH. The multi-species pipeline will raise an error if PHYLIP is not found. Install it via conda before running `coral run_multi`.
+**Note:** PHYLIP must be installed and available in PATH. The multi-species pipeline will raise an error if PHYLIP is not found. Conda installation is recommended but not required.
+
+---
+
+## Documentation
+
+- **[tutorial.ipynb](tutorial.ipynb)** - Command-line tutorial with examples
+- **[OUTPUT_FORMAT.md](OUTPUT_FORMAT.md)** - Output file structure and naming conventions
 
 ---
 

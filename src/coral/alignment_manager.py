@@ -256,6 +256,7 @@ class Aligner:
     def get_aligner_cmd_from_name(self, name):
         commands = {
             "bwa": "bwa mem -t {cores} {ref} {fq}",
+            "bwa-mem2": "bwa-mem2 mem -t {cores} {ref} {fq}",
             "minimap2": "minimap2 -t {cores} -ax sr {ref} {fq}",
             #"bbmap": "bbmap.sh ref={ref} threads={cores} in={fq} out=stdout.sam"
             "bbmap": "bbmap.sh ref={ref} threads={cores} in={fq} out=stdout.sam path={tmp}"
