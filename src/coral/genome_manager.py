@@ -112,7 +112,6 @@ class Genome:
         log(f"Indexing complete for {self.name}", self.verbose)
 
 
-
     def generate_fragment_fastq(self, length=150, output_fastq = None, offset=75, force=False):
         output_fastq = output_fastq if output_fastq else os.path.join(self.output_dir, f"{self.name}.fastq")
         

@@ -120,6 +120,53 @@ The following files are created in the `Tables/` directory:
 **Location:**
 `<run_id>/Tables/`
 
+**Table Format:**
+
+#### `triplets.tsv`
+
+This file contains trinucleotide context counts for each mutation file. Each row represents a trinucleotide context (e.g., `ATG`, `ATT`, `ATA`), and columns represent different mutation files.
+
+**Format:**
+- First column: Trinucleotide context (e.g., `ATG`, `ATT`, `ATA`)
+- Subsequent columns: Counts for each mutation file, with column headers matching the mutation file names (without extensions)
+
+**Example:**
+```
+Saccharomyces_cerevisiae_S288C__Saccharomyces_paradoxus__Saccharomyces_mikatae_IFO_1815__mutations	Saccharomyces_paradoxus__Saccharomyces_cerevisiae_S288C__Saccharomyces_mikatae_IFO_1815__mutations
+ATG	120647	120647
+ATT	165537	165537
+ATA	128936	128936
+TTC	138995	138995
+CCT	56896	56896
+TTT	213608	213608
+```
+
+#### `normalized_scaled.tsv`
+
+This file contains normalized mutation spectra with mutation types in the format `X[Y>Z]W`, where:
+- `X` and `W` are the 5' and 3' flanking bases (trinucleotide context)
+- `Y` is the reference base
+- `Z` is the derived base
+
+Each row represents a mutation type, and columns represent counts for each mutation file.
+
+**Format:**
+- First column: Mutation type in format `X[Y>Z]W` (e.g., `A[T>C]A`, `T[T>C]T`)
+- Subsequent columns: Normalized counts for each mutation file, with column headers matching the mutation file names (without extensions)
+
+**Example:**
+```
+Saccharomyces_cerevisiae_S288C__Saccharomyces_paradoxus__Saccharomyces_mikatae_IFO_1815__mutations	Saccharomyces_paradoxus__Saccharomyces_cerevisiae_S288C__Saccharomyces_mikatae_IFO_1815__mutations
+A[T>C]A	4812	3749
+T[T>C]T	6118	5466
+T[T>A]C	352	236
+T[C>T]T	5322	3368
+C[C>T]T	3558	2414
+C[T>C]G	3635	3480
+```
+
+**Note:** The mutation type format `X[Y>Z]W` represents a substitution from `Y` to `Z` in the context of flanking bases `X` and `W`. For example, `A[T>C]A` means a T→C substitution in the context of A on both sides (i.e., the trinucleotide context is `ATA` → `ACA`).
+
 ### Interval Files
 
 **Pattern:**
@@ -182,7 +229,11 @@ For `coral run_multi`, additional files are created:
 ### TSV Tables (`.tsv`)
 - Format: Tab-separated values
 - Content: Normalized mutation spectra, collapsed counts, or triplet frequencies
-- Index: Mutation types (e.g., `A>T`, `C>G` in context)
+- Structure: 
+  - First column: Row identifier (trinucleotide context or mutation type)
+  - Subsequent columns: Counts for each mutation file (column headers match mutation file names)
+- Mutation type format: `X[Y>Z]W` where `X` and `W` are flanking bases, `Y` is reference base, `Z` is derived base
+- See [Normalized Spectra Tables](#normalized-spectra-tables) section above for detailed format examples
 
 ### Interval Files (`.tsv.gz`)
 - Format: Gzipped TSV
