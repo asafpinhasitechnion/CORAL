@@ -63,29 +63,54 @@ class Genome:
     def index(self, aligner="bwa"):
         log(f"Indexing genome for {self.name} with {aligner}...", self.verbose)
 
-        required_bwa_exts = ["amb", "ann", "bwt", "pac", "sa"]
-        required_all = [f"{self.fasta_path}.{ext}" for ext in required_bwa_exts]
-        required_all.append(f"{self.fasta_path}.fai")  # samtools index
+        aligner = (aligner or "").lower()
 
-        all_exist = all(os.path.exists(f) for f in required_all)
+        # We only explicitly index for the BWA family.
+        # minimap2 and bbmap build indices implicitly or in-memory.
+        if aligner not in {"bwa", "bwa-mem2"}:
+            # Still ensure FASTA index exists (used by samtools / pileup)
+            fai = f"{self.fasta_path}.fai"
+            if not os.path.exists(fai) or self.no_cache:
+                if os.path.exists(fai):
+                    os.remove(fai)
+                run_cmd(["samtools", "faidx", self.fasta_path], verbose=self.verbose)
+            log(f"No explicit index required for aligner '{aligner}'.", self.verbose)
+            return
+
+        # ---- BWA family explicit indexing ----
+
+        if aligner == "bwa-mem2":
+            # bwa-mem2 index files
+            required_exts = ["bwt.2bit.64", "pac", "sa"]
+            index_cmd = ["bwa-mem2", "index", self.fasta_path]
+        else:
+            # classic bwa index files
+            required_exts = ["amb", "ann", "bwt", "pac", "sa"]
+            index_cmd = ["bwa", "index", self.fasta_path]
+
+        required_all = [f"{self.fasta_path}.{ext}" for ext in required_exts]
+        required_all.append(f"{self.fasta_path}.fai")
+
+        all_exist = all(os.path.exists(p) for p in required_all)
 
         if all_exist and not self.no_cache:
             log(f"Index files already exist for {self.name}. Skipping indexing.", self.verbose)
             return
 
-        for ext in required_bwa_exts + ["fai"]:
+        # Remove existing index files (safe for re-index)
+        for ext in required_exts + ["fai"]:
             path = f"{self.fasta_path}.{ext}"
             if os.path.exists(path):
                 os.remove(path)
 
-        # if aligner == "bwa":
-        run_cmd(["bwa", "index", self.fasta_path], verbose = self.verbose)
-        # else:
-        #     raise ValueError(f"Aligner '{aligner}' not supported for indexing.")
+        # Build aligner index
+        run_cmd(index_cmd, verbose=self.verbose)
 
-        run_cmd(["samtools", "faidx", self.fasta_path], verbose = self.verbose)
+        # Always build samtools FASTA index
+        run_cmd(["samtools", "faidx", self.fasta_path], verbose=self.verbose)
 
         log(f"Indexing complete for {self.name}", self.verbose)
+
 
 
     def generate_fragment_fastq(self, length=150, output_fastq = None, offset=75, force=False):

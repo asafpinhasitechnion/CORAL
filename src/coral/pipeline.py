@@ -108,7 +108,7 @@ class MutationExtractionPipeline:
             verbose=self.verbose
         )
         self.reference.download()
-        self.reference.index(aligner='bwa')
+        self.reference.index(aligner=self.aligner_name)
 
         # Ingroup genomes
         for name, acc in self.species_list:
@@ -408,7 +408,7 @@ class MultiSpeciesMutationPipeline:
             genome.download()
 
             if species == self.outgroup_name:
-                genome.index()
+                genome.index(aligner=self.aligner_name)
                 self.reference = genome
             else:
                 genome.generate_fragment_fastq(
