@@ -127,9 +127,8 @@ cleanup_output.sh output/ --bams --pileup --intervals --genomes
 ## Scalability
 
 - Each species-to-reference alignment is independent
-- Runs can be parallelized across species or clades
 - No full multiple sequence alignment required
-- Suitable for large comparative datasets and cluster execution
+- Suitable for large comparative datasets and cluster execution (e.g. condor)
 
 ---
 
