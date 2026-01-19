@@ -24,7 +24,7 @@ Please cite: *Reference will be available upon publication.*
 
 ### Requirements
 
-* Linux or macOS (tested on Ubuntu via WSL2)
+* Linux (or WSL2 for windows)
 * Conda (Miniforge or Anaconda recommended)
 
 ### Recommended installation
