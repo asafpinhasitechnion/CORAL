@@ -76,7 +76,7 @@ coral run_single \
   --outgroup Saccharomyces_mikatae_IFO_1815 GCF_947241705.1 \
   --species Saccharomyces_paradoxus GCF_002079055.1 \
             Saccharomyces_cerevisiae_S288C GCF_000146045.2 \
-  --output ./test_output \
+  --output ../test_output \
   --mapq 60 \
   --suffix test
 ```
@@ -93,7 +93,7 @@ coral run_multi \
                    ["Drosophila_sechellia","GCF_000006755.1"],
                    ["Drosophila_simulans","GCF_016746395.2"]]' \
   --outgroup Drosophila_simulans \
-  --output ./test_output \
+  --output ../test_output \
   --run-id drosophila_test \
   --mapq 60
 ```
