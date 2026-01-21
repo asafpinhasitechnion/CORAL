@@ -89,7 +89,7 @@ This runs the full pipeline, including genome download, reference indexing, read
 
 ```bash
 coral run_multi \
-  --species-list '[["Drosophila_melanogaster","GCF_000001215.4"],["Drosophila_sechellia","GCF_000006755.1"],["Drosophila_mauritiana","GCF_004382145.1"],["Drosophila_simulans","GCF_016746395.2"]]' \
+  --species-list '[["Drosophila_melanogaster","GCF_000001215.4"],["Drosophila_sechellia","GCF_004382195.2"],["Drosophila_mauritiana","GCF_004382145.1"],["Drosophila_simulans","GCF_016746395.2"]]' \
   --outgroup Drosophila_simulans \
   --output ../test_output \
   --run-id drosophila_test \
