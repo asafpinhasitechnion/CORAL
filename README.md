@@ -10,7 +10,7 @@ It aligns multiple species to a shared reference genome, simulates reads, filter
 
 ## Reference
 
-Please cite: *Reference will be available upon publication.*
+Preprint available at https://doi.org/10.64898/2026.02.02.703326
 
 ---
 
@@ -158,7 +158,9 @@ See `OUTPUT_FORMAT.md` for full file format and naming conventions.
 
 ## Citation
 
-Reference will be provided upon publication.
+Details, benchmarking, and results are available in the preprint: https://doi.org/10.64898/2026.02.02.703326
+
+The final reference will be updated upon publication.
 
 ---
 
